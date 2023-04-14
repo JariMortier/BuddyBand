@@ -15,14 +15,14 @@ Adafruit_NeoPixel strip(stripCount, stripPin, NEO_GRB);
 //initialising global vars
 
 float N = 30;
-int n = ceil(12 * (1 - pow(2.72, -N / 18)));
-int raveState = 0;
-unsigned int raveHue = 0;
-int ravePix = 0;
+uint8_t n = ceil(12 * (1 - pow(2.72, -N / 18)));
+uint8_t raveState = 0;
+uint16_t raveHue = 0;
+uint8_t ravePix = 0;
 bool buttonState = 0;
 bool flashState = 0;
 bool buddyState = 0;
-uint32_t bright = strip.Color(255, 255, 255);
+uint bright = strip.Color(255, 255, 255);
 
 
 
@@ -41,11 +41,6 @@ void loop() {
   buttonState = digitalRead(35);
   flashState = digitalRead(33);
   buddyState = digitalRead(32);
-
-  Serial.print("buttonstate: ");
-  Serial.println(buttonState);
-  Serial.print("flashstate: ");
-  Serial.println(flashState);
 
   strip.setBrightness(40);
 
@@ -103,11 +98,11 @@ void loop() {
       break;
     case 1:  //fast rave
       raveHue += 1000;
-      ravePix += 2;
-      ravePix %= stripCount * 2;
+      ravePix++;
+      ravePix %= stripCount;
       for (int i = 0; i < (stripCount / 2); i++) {
-        strip.setPixelColor((ravePix / 2) - i, strip.ColorHSV(raveHue, 255, max(raveBright - (raveDecrement * i), 0)));
-        strip.setPixelColor(((ravePix / 2) - i + (stripCount / 2)) % stripCount, strip.ColorHSV((raveHue + 16384) % 65536, 255, max(raveBright - (raveDecrement * i), 0)));
+        strip.setPixelColor(ravePix - i, strip.ColorHSV(raveHue, 255, max(raveBright - (raveDecrement * i), 0)));
+        strip.setPixelColor((ravePix - i + (stripCount / 2)) % stripCount, strip.ColorHSV((raveHue + 16384) % 65536, 255, max(raveBright - (raveDecrement * i), 0)));
       }
       break;
     case 2:  //slow rave
