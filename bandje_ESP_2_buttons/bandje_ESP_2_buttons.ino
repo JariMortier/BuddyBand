@@ -20,51 +20,60 @@ int raveState = 0;
 unsigned int raveHue = 0;
 int ravePix = 0;
 bool buttonState = 0;
+bool flashState = 0;
 bool buddyState = 0;
 uint32_t bright = strip.Color(255, 255, 255);
 
-unsigned long long prevMillis = 0;
 
 
 
 void setup() {
   pinMode(32, INPUT);
   pinMode(35, INPUT);
+  pinMode(33, INPUT);
   strip.begin();
   strip.show();
   randomSeed(analogRead(34));
   Serial.begin(9600);
-  prevMillis = millis();
 }
 
 void loop() {
   buttonState = digitalRead(35);
+  flashState = digitalRead(33);
   buddyState = digitalRead(32);
 
-  prevMillis = millis();
+  Serial.print("buttonstate: ");
+  Serial.println(buttonState);
+  Serial.print("flashstate: ");
+  Serial.println(flashState);
 
   strip.setBrightness(40);
 
-  if (buttonState) {
+  if (buttonState && raveState != 5) {
     raveState++;
     raveState %= 3;
     while (buttonState) {  //only register on release => prevent going through state increments multiple times
       buttonState = digitalRead(35);
-      if (millis() - prevMillis >= 1200) {  //check for hold after 1.2 seconds without delay()
-        raveState = 5;
-        strip.setBrightness(255);
-        strip.fill(bright, 0, stripCount);
-        strip.show();
-      }
+    }
+  }
+
+  if (flashState){
+    while(flashState){
+      flashState = digitalRead(33);
+    }
+    if (raveState == 5){
+      raveState = 0;
+    } else {
+      raveState = 5;      
     }
   }
 
   if (buddyState) {
     N = random(1, 40);
-    n = ceil(16 * (1 - pow(2.72, -N / 18)));    //calculate the number of leds lighting up.
+    n = ceil(stripCount * (1 - pow(2.72, -N / 18)));    //calculate the number of leds lighting up.
     unsigned int color = random(0, 65535);
     for (int i = 0; i < 3; i++) {  //
-      for (int j = 0; j < 18; j++) {
+      for (int j = 0; j < stripCount + 2; j++) {
         strip.setPixelColor(j, strip.ColorHSV(color, 255, 80));
         strip.setPixelColor((j - 2) % stripCount, 0);
         strip.show();
