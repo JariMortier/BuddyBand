@@ -38,9 +38,9 @@ void setup() {
 }
 
 void loop() {
-  buttonState = digitalRead(35);
+  buttonState = digitalRead(32);
   flashState = digitalRead(33);
-  buddyState = digitalRead(32);
+  buddyState = digitalRead(35);
 
   strip.setBrightness(40);
 
@@ -48,7 +48,7 @@ void loop() {
     raveState++;
     raveState %= 3;
     while (buttonState) {  //only register on release => prevent going through state increments multiple times
-      buttonState = digitalRead(35);
+      buttonState = digitalRead(32);
     }
   }
 
@@ -83,7 +83,7 @@ void loop() {
       delay(50);
     }
     while (buddyState) {  //lock the band when in buddyMode
-      buddyState = digitalRead(32);
+      buddyState = digitalRead(35);
     }
     if (raveState == 5) {  //don't reconnect into flashlightMode
       raveState = 0;
